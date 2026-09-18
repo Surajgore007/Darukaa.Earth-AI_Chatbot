@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darukaa.Earth — Biodiversity Intelligence Assistant</title>
+  <style>
+    :root {
+      --bg-color: #0d1310;
+      --card-bg: #141c18;
+      --border-color: #24352d;
+      --primary: #2ea043;
+      --primary-hover: #3fb950;
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --badge-high: #238636;
+      --badge-med: #d29922;
+      --badge-low: #f85149;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 16px 24px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 18px; font-weight: 600; color: #56d364; display: flex; align-items: center; gap: 8px; }
+    .status { font-size: 12px; color: var(--text-muted); }
+    #chat-container { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .message { max-width: 80%; padding: 14px 18px; border-radius: 8px; line-height: 1.5; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+    .user-msg { background: #238636; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+    .bot-msg { background: var(--card-bg); align-self: flex-start; border: 1px solid var(--border-color); border-bottom-left-radius: 2px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
+    .badge-HIGH { background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid #238636; }
+    .badge-MEDIUM { background: rgba(210, 153, 34, 0.2); color: #d29922; border: 1px solid #d29922; }
+    .badge-LOW { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid #da3633; }
+    .quick-examples { padding: 8px 24px; display: flex; gap: 8px; overflow-x: auto; background: var(--card-bg); border-top: 1px solid var(--border-color); }
+    .chip { background: #1c2722; border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .chip:hover { border-color: var(--primary); color: var(--text-main); }
+    footer { padding: 16px 24px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; gap: 12px; }
+    input[type="text"] { flex: 1; background: #0b100e; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px; color: var(--text-main); font-size: 14px; outline: none; }
+    input[type="text"]:focus { border-color: var(--primary); }
+    button { background: var(--primary); color: white; border: none; border-radius: 6px; padding: 12px 24px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; }
+    button:hover { background: var(--primary-hover); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌱 Darukaa.Earth — AI Environmental Scientist</h1>
+    <span class="status" id="session-display">Session: loading...</span>
+  </header>
+
+  <div id="chat-container">
+    <div class="message bot-msg">
+      Hello! I am your AI Environmental Scientist. I formulate evidence-backed, multi-metric recommendations combining soil health, hydrology, land-use, climate, and biodiversity indicators.
+      
+Tell me about your land conditions (e.g. soil organic carbon %, rainfall pattern, crop, region) to begin.
+    </div>
+  </div>
+
+  <div class="quick-examples">
+    <button class="chip" onclick="sendPrompt('soil organic carbon = 0.3%, rainfall = low, crop = monoculture wheat, region = semi-arid')">🌾 Semi-arid Wheat (SOC 0.3%)</button>
+    <button class="chip" onclick="sendPrompt('Biodiversity is declining on my land.')">❓ Incomplete Context (Triggers Clarification)</button>
+    <button class="chip" onclick="sendPrompt('High synthetic fertilizer runoff is causing nitrate pollution in our local stream.')">💧 Fertilizer Runoff & Water</button>
+  </div>
+
+  <footer>
+    <input type="text" id="user-input" placeholder="Type your environmental question or land parameters..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button id="send-btn" onclick="sendMessage()">Send</button>
+  </footer>
+
+  <script>
+    const sessionId = "session-" + Math.random().toString(36).substring(2, 9);
+    document.getElementById("session-display").textContent = "Session: " + sessionId;
+
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      addMessage(text, "user-msg");
+
+      try {
+        const btn = document.getElementById("send-btn");
+        btn.disabled = true;
+        btn.textContent = "Analyzing...";
+
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, session_id: sessionId })
+        });
+        const data = await res.json();
+        btn.disabled = false;
+        btn.textContent = "Send";
+
+        let badgeHtml = "";
+        if (data.confidence) {
+          badgeHtml = `<span class="badge badge-${data.confidence}">Confidence: ${data.confidence}</span><br>`;
+        }
+        addMessage(badgeHtml + data.response, "bot-msg", true);
+      } catch (err) {
+        document.getElementById("send-btn").disabled = false;
+        document.getElementById("send-btn").textContent = "Send";
+        addMessage("⚠️ Error: " + err.message, "bot-msg");
+      }
+    }
+
+    function sendPrompt(promptText) {
+      document.getElementById("user-input").value = promptText;
+      sendMessage();
+    }
+
+    function addMessage(content, className, isHtml = false) {
+      const chat = document.getElementById("chat-container");
+      const msg = document.createElement("div");
+      msg.className = "message " + className;
+      if (isHtml) msg.innerHTML = content;
+      else msg.textContent = content;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
