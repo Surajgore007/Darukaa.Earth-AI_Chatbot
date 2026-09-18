@@ -6,8 +6,10 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-StateGraph-orange.svg)
 ![PostgreSQL](https://img.shields.io/badge/Supabase-pgvector-3ecf8e.svg)
 ![Gemini](https://img.shields.io/badge/Google%20Gemini-2.5--flash-4285F4.svg)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black?logo=vercel)](https://darukaa-earth-ai-chatbot.vercel.app)
 
-A production-grade, explainable, and scientifically grounded conversational intelligence system that acts as an **AI Environmental Scientist**. Built for the Darukaa.Earth Hackathon / Internship Challenge, this MVP reasons across multiple environmental variables simultaneously (soil, climate, land use, biodiversity, human impact), grounds every recommendation in verifiable scientific evidence (FAO, IPCC, IPBES), asks focused clarifying questions when input is incomplete, and programmatically computes confidence.
+> 🌐 **Live Demo Web Application**: [https://darukaa-earth-ai-chatbot.vercel.app](https://darukaa-earth-ai-chatbot.vercel.app)  
+> 📚 **Interactive Swagger API Documentation**: [https://darukaa-earth-ai-chatbot.vercel.app/docs](https://darukaa-earth-ai-chatbot.vercel.app/docs)
 
 ---
 

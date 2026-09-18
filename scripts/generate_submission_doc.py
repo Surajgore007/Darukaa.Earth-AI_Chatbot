@@ -38,7 +38,7 @@ def create_submission_doc(output_path: str = "Darukaa_Earth_Submission.docx"):
     p.add_run("Repository Access: ").bold = True
     p.add_run("Public (accessible without invitation)\n")
     p.add_run("Live Demo URL: ").bold = True
-    p.add_run("http://localhost:8000 (FastAPI Interactive Web Interface & API Docs at /docs)\n")
+    p.add_run("https://darukaa-earth-ai-chatbot.vercel.app (FastAPI Interactive Web Interface & API Docs at /docs)\n")
     p.add_run("Candidate Name: ").bold = True
     p.add_run("Suraj Gore\n")
     p.add_run("Project: ").bold = True
