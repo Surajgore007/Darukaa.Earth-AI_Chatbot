@@ -1,0 +1,7 @@
+.git
+.github
+.venv
+tests
+scripts
+*.docx
+.pytest_cache
